@@ -28,6 +28,7 @@ const AuthRouter = () => {
         <div className="col content-center">
           <BrowserRouter>
             <Routes>
+              <Route path="/" element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/sign-up" element={<Signup />} />
             </Routes>
