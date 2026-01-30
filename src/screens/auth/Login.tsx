@@ -2,6 +2,7 @@ import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
+import handleAPI from "../../apis/handleAPI";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -10,8 +11,15 @@ const Login = () => {
   const [isLoading, SetIsLoading] = useState(false);
   const [isRemember, SetIsRemember] = useState(false);
 
-  const handleLogin = (values: { email: string; password: string }) => {
+  const handleLogin = async (values: { email: string; password: string }) => {
     console.log("Thông tin đăng nhập:", values);
+
+    try {
+      const res = handleAPI("/auth/register", values, "post");
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
