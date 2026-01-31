@@ -3,12 +3,17 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../redux/reducers/authReducer";
+import { localDataNames } from "../../constants/appInfos";
 
 const { Title, Paragraph, Text } = Typography;
 
 const Signup = () => {
   const [form] = Form.useForm();
   const [isLoading, SetIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
 
   const handleSignup = async (values: {
     name: string;
@@ -19,8 +24,12 @@ const Signup = () => {
 
     const api = `/auth/register`;
     try {
-      const res = await handleAPI(api, values, "post");
-      console.log(res);
+      const res: any = await handleAPI(api, values, "post");
+
+      if (res.data) {
+        message.success(res.message);
+        dispatch(addAuth(res.data));
+      }
     } catch (err: any) {
       message.error(err.message);
     } finally {
@@ -32,6 +41,14 @@ const Signup = () => {
     <div>
       <Card style={{ width: 400 }}>
         <div className="text-center">
+          <img
+            className="mb-3 rounded-circle"
+            src={
+              "https://res.cloudinary.com/defgbyoii/image/upload/v1769685200/logo_MIFATINO_900x900_jx0skm.jpg"
+            }
+            alt="logo"
+            style={{ width: 48, height: 48 }}
+          />
           <Title level={2}>Đăng ký</Title>
           <Paragraph type="secondary">
             Bạn sẽ được trải nghiệm không gian mua sắm tuyệt vời.

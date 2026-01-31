@@ -1,8 +1,19 @@
-import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Form,
+  Input,
+  message,
+  Space,
+  Typography,
+} from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../redux/reducers/authReducer";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -10,15 +21,16 @@ const Login = () => {
   const [form] = Form.useForm();
   const [isLoading, SetIsLoading] = useState(false);
   const [isRemember, SetIsRemember] = useState(false);
+  const dispatch = useDispatch();
 
   const handleLogin = async (values: { email: string; password: string }) => {
-    console.log("Thông tin đăng nhập:", values);
-
+    const api = `/auth/login`;
     try {
-      const res = await handleAPI("/auth/register", values, "post");
-      console.log(res);
-    } catch (error) {
-      console.log(error);
+      const res: any = await handleAPI(api, values, "post");
+      res.data && dispatch(addAuth(res.data));
+      message.success(res.message);
+    } catch (error: any) {
+      message.error(error.message);
     }
   };
 
