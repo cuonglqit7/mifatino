@@ -23,7 +23,7 @@ const AuthRouter = () => {
               style={{ width: 256, height: 256, objectFit: "cover" }}
             />
           </div>
-          <Title>MIFATINO</Title>
+          <Title style={{ color: "#d1ae53" }}>MIFATINO</Title>
         </div>
         <div className="col content-center">
           <BrowserRouter>

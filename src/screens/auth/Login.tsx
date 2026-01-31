@@ -15,7 +15,7 @@ const Login = () => {
     console.log("Thông tin đăng nhập:", values);
 
     try {
-      const res = handleAPI("/auth/register", values, "post");
+      const res = await handleAPI("/auth/register", values, "post");
       console.log(res);
     } catch (error) {
       console.log(error);

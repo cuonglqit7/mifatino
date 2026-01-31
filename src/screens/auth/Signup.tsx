@@ -1,7 +1,8 @@
-import { Button, Card, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Form, Input, message, Space, Typography } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
+import handleAPI from "../../apis/handleAPI";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -9,12 +10,22 @@ const Signup = () => {
   const [form] = Form.useForm();
   const [isLoading, SetIsLoading] = useState(false);
 
-  const handleSignup = (values: {
+  const handleSignup = async (values: {
     name: string;
     email: string;
     password: string;
   }) => {
-    console.log(values);
+    SetIsLoading(true);
+
+    const api = `/auth/register`;
+    try {
+      const res = await handleAPI(api, values, "post");
+      console.log(res);
+    } catch (err: any) {
+      message.error(err.message);
+    } finally {
+      SetIsLoading(false);
+    }
   };
 
   return (
@@ -55,7 +66,19 @@ const Signup = () => {
           <Form.Item
             name="password"
             label="Mật Khẩu"
-            rules={[{ required: true, message: "Vui lòng điền mật khẩu!" }]}
+            rules={[
+              { required: true, message: "Vui lòng điền mật khẩu!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value.length > 6) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("Mật khẩu cần trên 6 ký tự!"),
+                  );
+                },
+              }),
+            ]}
           >
             <Input.Password
               maxLength={100}
@@ -65,12 +88,13 @@ const Signup = () => {
           </Form.Item>
         </Form>
 
-        <div className="mt-4 mb-3">
+        <div className="mt-5 mb-3">
           <Button
             type="primary"
             style={{ width: "100%" }}
             size="large"
             onClick={() => form.submit()}
+            loading={isLoading}
           >
             Đăng ký ngay
           </Button>
