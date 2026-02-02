@@ -1,7 +1,14 @@
 import axios, { AxiosResponse } from "axios";
 import queryString from "query-string";
+import { localDataNames } from "../constants/appInfos";
 
 const baseURL = `http://192.168.1.69:3001`;
+
+const getAccessToken = () => {
+  const res = localStorage.getItem(localDataNames.authData);
+
+  return res ? JSON.parse(res).token : "";
+};
 
 const axiosClient = axios.create({
   baseURL,
@@ -10,8 +17,10 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   async (config: any) => {
+    const accesstoken = getAccessToken();
+
     config.headers = {
-      Authorization: "",
+      Authorization: `Bearer ${accesstoken}`,
       Accept: "application/json",
       ...config.headers,
     };
@@ -19,6 +28,7 @@ axiosClient.interceptors.request.use(
     if (config.data) {
       config.data = { ...config.data };
     }
+    console.log(config);
 
     return config;
   },
