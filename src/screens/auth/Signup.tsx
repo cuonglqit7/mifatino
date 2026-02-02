@@ -1,11 +1,9 @@
 import { Button, Card, Form, Input, message, Space, Typography } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
-import { localDataNames } from "../../constants/appInfos";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -116,8 +114,6 @@ const Signup = () => {
             Đăng ký ngay
           </Button>
         </div>
-
-        <SocialLogin />
 
         <div className="mt-4 text-center">
           <Space>

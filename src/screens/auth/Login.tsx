@@ -14,23 +14,31 @@ import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
+import { localDataNames } from "../../constants/appInfos";
 
 const { Title, Paragraph, Text } = Typography;
 
 const Login = () => {
   const [form] = Form.useForm();
-  const [isLoading, SetIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRemember, SetIsRemember] = useState(false);
   const dispatch = useDispatch();
 
   const handleLogin = async (values: { email: string; password: string }) => {
+    setIsLoading(true);
     const api = `/auth/login`;
     try {
       const res: any = await handleAPI(api, values, "post");
-      res.data && dispatch(addAuth(res.data));
       message.success(res.message);
+
+      if (isRemember) {
+        localStorage.setItem(localDataNames.authData, JSON.stringify(res.data));
+      }
+      res.data && dispatch(addAuth(res.data));
     } catch (error: any) {
       message.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,6 +104,7 @@ const Login = () => {
 
           <div className="mt-4 mb-3">
             <Button
+              loading={isLoading}
               type="primary"
               style={{ width: "100%" }}
               size="large"
@@ -105,7 +114,7 @@ const Login = () => {
             </Button>
           </div>
 
-          <SocialLogin />
+          <SocialLogin isRemember={isRemember} />
 
           <div className="mt-4 text-center">
             <Space>
