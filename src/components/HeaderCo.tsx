@@ -25,7 +25,7 @@ const HeaderCo = () => {
               type="text"
               icon={<Notification size={22} color="gray" />}
             />
-            <Avatar src={appInfos.logo} />
+            <Avatar src={appInfos.logo} size={40} />
           </Space>
         </div>
       </div>

@@ -19,7 +19,7 @@ const MainRouter = () => {
         <SiderCo />
         <Layout>
           <HeaderCo />
-          <Content>
+          <Content className="mt-3 mb-2 container bg-white">
             <Routes>
               <Route path="/" element={<HomeScreen />} />
               <Route path="/inventories" element={<Inventories />} />
