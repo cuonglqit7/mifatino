@@ -14,8 +14,18 @@ const Suppliers = () => {
   const [suppliers, setSuppliers] = useState<SupplierModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [supplierSelected, setSupplierSelected] = useState<SupplierModel>();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState<number>(10);
 
   const columns: ColumnProps<SupplierModel>[] = [
+    {
+      title: "",
+      dataIndex: "_id",
+      render: (_: any, __: any, index: number) =>
+        (page - 1) * pageSize + index + 1,
+      align: "center",
+    },
     {
       key: "name",
       dataIndex: "name",
@@ -91,15 +101,16 @@ const Suppliers = () => {
 
   useEffect(() => {
     getSuppliers();
-  }, []);
+  }, [page, pageSize]);
 
   const getSuppliers = async () => {
     setIsLoading(true);
-    const api = `/suppliers`;
+    const api = `/suppliers?page=${page}&pageSize=${pageSize}`;
     try {
       const res = await handleAPI(api);
 
-      res.data && setSuppliers(res.data);
+      res.data && setSuppliers(res.data.items);
+      setTotal(res.data.total);
     } catch (error: any) {
       console.log(error.message);
       message.error(error.message);
@@ -121,6 +132,17 @@ const Suppliers = () => {
   return (
     <div>
       <Table
+        pagination={{
+          showSizeChanger: true,
+          onShowSizeChange: (_current, size) => {
+            setPageSize(size);
+          },
+          total,
+          onChange(page, _pageSize) {
+            setPage(page);
+          },
+        }}
+        scroll={{ y: "calc(100vh - 280px)" }}
         loading={isLoading}
         columns={columns}
         dataSource={suppliers}

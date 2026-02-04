@@ -60,7 +60,9 @@ const ToggleSupplierModal = (props: Props) => {
       data.slug = replaceNameFile(values.name);
       const res = await handleAPI(api, data, supplier ? "put" : "post");
 
-      message.success("Thêm nhà cung cấp thành công");
+      message.success(
+        supplier ? "Cập nhật thành công" : "Thêm nhà cung cấp thành công",
+      );
       !supplier && onAddNew(res.data);
       handleClose();
     } catch (error: any) {
@@ -130,25 +132,25 @@ const ToggleSupplierModal = (props: Props) => {
             { required: true, message: "Vui lòng nhập tên nhà cung cấp" },
           ]}
         >
-          <Input placeholder="Nhập tên nhà cung cấp" allowClear></Input>
+          <Input placeholder="Nhập tên nhà cung cấp" allowClear />
         </Form.Item>
         <Form.Item name={"product"} label="Sản phẩm">
-          <Input placeholder="Nhập sản phẩm" allowClear></Input>
+          <Input placeholder="Nhập sản phẩm" allowClear />
         </Form.Item>
         <Form.Item name={"categories"} label="Danh mục">
           <Select options={[]} placeholder="Chọn danh mục" />
         </Form.Item>
         <Form.Item name={"price"} label="Giá">
-          <Input type={"number"} placeholder="Nhập giá" allowClear></Input>
+          <Input type={"number"} placeholder="Nhập giá" allowClear />
         </Form.Item>
         <Form.Item name={"contact"} label="SĐT">
-          <Input type={"number"} placeholder="Nhập SĐT"></Input>
+          <Input type={"number"} placeholder="Nhập SĐT" />
         </Form.Item>
         <Form.Item name={"email"} label="Email">
-          <Input type={"email"} placeholder="Nhập Email" allowClear></Input>
+          <Input type={"email"} placeholder="Nhập Email" allowClear />
         </Form.Item>
         <Form.Item name={"active"} label="Trạng thái">
-          <Input type={"number"} allowClear></Input>
+          <Input type={"number"} allowClear />
         </Form.Item>
         <Form.Item label="Trạng thái">
           <div className="mb-2">
@@ -156,14 +158,14 @@ const ToggleSupplierModal = (props: Props) => {
               type={isTaking === false ? "primary" : "default"}
               onClick={() => setIsTaking(false)}
             >
-              Không hoạt động
+              Chưa thanh toán
             </Button>
           </div>
           <Button
             type={isTaking ? "primary" : "default"}
             onClick={() => setIsTaking(true)}
           >
-            Đang hoạt động
+            Đã thanh toán
           </Button>
         </Form.Item>
       </Form>

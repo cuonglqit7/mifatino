@@ -1,10 +1,38 @@
-import { appInfos } from "@/constants/appInfos";
-import { Avatar, Button, Input, Layout, Space } from "antd";
-import { Notification, SearchNormal, SearchNormal1 } from "iconsax-reactjs";
+import { auth } from "@/firebases/firebaseConfig";
+import { authSelector, removeAuth } from "@/redux/reducers/authReducer";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  Input,
+  Layout,
+  MenuProps,
+  Space,
+} from "antd";
+import { signOut } from "firebase/auth";
+import { Notification, SearchNormal } from "iconsax-reactjs";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
 
 const HeaderCo = () => {
+  const user = useSelector(authSelector);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const items: MenuProps["items"] = [
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      onClick: async () => {
+        signOut(auth);
+        dispatch(removeAuth({}));
+        localStorage.clear();
+        navigate("/");
+      },
+    },
+  ];
   return (
     <Header className="p-0 d-flex justify-content-between align-items-center bg-white">
       <div className="p-2 row w-100">
@@ -25,7 +53,9 @@ const HeaderCo = () => {
               type="text"
               icon={<Notification size={22} color="gray" />}
             />
-            <Avatar src={appInfos.logo} size={40} />
+            <Dropdown menu={{ items }}>
+              <Avatar src={user.photoURL} size={40} />
+            </Dropdown>
           </Space>
         </div>
       </div>
