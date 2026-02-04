@@ -1,17 +1,19 @@
 import handleAPI from "@/apis/handleAPI";
 import { ToggleSupplierModal } from "@/modals";
 import { SupplierModel } from "@/models/SupplierModel";
-import { Button, message, Space, Typography } from "antd";
+import { Button, message, Modal, Space, Tooltip, Typography } from "antd";
 import Table, { ColumnProps } from "antd/es/table";
-import { Sort } from "iconsax-reactjs";
+import { Edit2, Sort, UserRemove } from "iconsax-reactjs";
 import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
+const { confirm } = Modal;
 
 const Suppliers = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [suppliers, setSuppliers] = useState<SupplierModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [supplierSelected, setSupplierSelected] = useState<SupplierModel>();
 
   const columns: ColumnProps<SupplierModel>[] = [
     {
@@ -47,8 +49,43 @@ const Suppliers = () => {
     },
     {
       key: "ontheway",
-      dataIndex: "",
+      dataIndex: "active",
       title: "Vận chuyển",
+      render: (num) => num ?? "-",
+    },
+    {
+      key: "buttonContainer",
+      title: "Chỉnh sửa",
+      dataIndex: "",
+      render: (item: SupplierModel) => (
+        <Space>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              icon={<Edit2 size={20} className="text-info" />}
+              onClick={() => {
+                setSupplierSelected(item);
+                setIsVisible(true);
+              }}
+            ></Button>
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button
+              type="text"
+              icon={<UserRemove size={20} className="text-danger" />}
+              onClick={() => {
+                confirm({
+                  title: "Confirm",
+                  content: "Bạn có chắc muốn xóa không?",
+                  onOk: () => delSupplier(item._id),
+                });
+              }}
+            ></Button>
+          </Tooltip>
+        </Space>
+      ),
+      fixed: "right",
+      align: "right",
     },
   ];
 
@@ -68,6 +105,16 @@ const Suppliers = () => {
       message.error(error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const delSupplier = async (id: string) => {
+    const api = `/suppliers?id=${id}`;
+    try {
+      await handleAPI(api, undefined, "delete");
+      getSuppliers();
+    } catch (error: any) {
+      console.log(error.message);
     }
   };
 
@@ -96,8 +143,13 @@ const Suppliers = () => {
       ></Table>
       <ToggleSupplierModal
         visible={isVisible}
-        onClose={() => setIsVisible(false)}
+        onClose={() => {
+          supplierSelected && getSuppliers();
+          setSupplierSelected(undefined);
+          setIsVisible(false);
+        }}
         onAddNew={(val: any) => setSuppliers([...suppliers, val])}
+        supplier={supplierSelected}
       />
     </div>
   );

@@ -13,7 +13,7 @@ import {
   Typography,
 } from "antd";
 import { User } from "iconsax-reactjs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
   visible: boolean;
@@ -22,20 +22,28 @@ interface Props {
   supplier?: SupplierModel;
 }
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 const ToggleSupplierModal = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { visible, onClose, onAddNew, supplier } = props;
   const [isTaking, setIsTaking] = useState<boolean>();
   const [file, setFile] = useState<any>();
-  const inpRef = useRef<any>(null);
 
+  const inpRef = useRef<any>(null);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (supplier) {
+      form.setFieldsValue(supplier);
+
+      setIsTaking(supplier.isTaking === 1);
+    }
+  }, [supplier]);
 
   const addNewSupplier = async (values: any) => {
     setIsLoading(true);
-    const api = `/suppliers`;
+    const api = `/suppliers?${supplier ? "id=" + supplier._id : ""}`;
     try {
       const data: any = {};
 
@@ -50,10 +58,10 @@ const ToggleSupplierModal = (props: Props) => {
         data.photoURL = await uploadFileToCloudiary(file);
       }
       data.slug = replaceNameFile(values.name);
-      const res = await handleAPI(api, data, "post");
+      const res = await handleAPI(api, data, supplier ? "put" : "post");
 
       message.success("Thêm nhà cung cấp thành công");
-      onAddNew(res.data);
+      !supplier && onAddNew(res.data);
       handleClose();
     } catch (error: any) {
       console.log(error.message);
@@ -76,7 +84,7 @@ const ToggleSupplierModal = (props: Props) => {
       open={visible}
       onCancel={handleClose}
       onOk={() => form.submit()}
-      title="Thêm mới"
+      title={supplier ? "Chỉnh sửa" : "Thêm mới"}
       okText="Xác nhận"
       cancelText="Hủy"
     >
@@ -84,6 +92,8 @@ const ToggleSupplierModal = (props: Props) => {
         <div className="col text-end">
           {file ? (
             <Avatar size={80} src={URL.createObjectURL(file)} />
+          ) : supplier ? (
+            <Avatar size={80} src={supplier.photoURL} />
           ) : (
             <Avatar
               size={80}
@@ -133,6 +143,12 @@ const ToggleSupplierModal = (props: Props) => {
         </Form.Item>
         <Form.Item name={"contact"} label="SĐT">
           <Input type={"number"} placeholder="Nhập SĐT"></Input>
+        </Form.Item>
+        <Form.Item name={"email"} label="Email">
+          <Input type={"email"} placeholder="Nhập Email" allowClear></Input>
+        </Form.Item>
+        <Form.Item name={"active"} label="Trạng thái">
+          <Input type={"number"} allowClear></Input>
         </Form.Item>
         <Form.Item label="Trạng thái">
           <div className="mb-2">

@@ -5,6 +5,8 @@ export interface SupplierModel {
   categories: string[];
   price: number;
   contact: string;
+  email: string;
+  active: number;
   isTaking: number;
   photoURL: string;
   createdAt: string;
