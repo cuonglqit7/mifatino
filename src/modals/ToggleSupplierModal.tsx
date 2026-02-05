@@ -1,17 +1,10 @@
 import handleAPI from "@/apis/handleAPI";
+import FormItems from "@/components/FormItems";
+import { FormModel } from "@/models/FormModel";
 import { SupplierModel } from "@/models/SupplierModel";
 import { replaceNameFile } from "@/utils/replaceNameFile";
 import { uploadFileToCloudiary } from "@/utils/uploadFileToCloudiary";
-import {
-  Avatar,
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Select,
-  Typography,
-} from "antd";
+import { Avatar, Button, Form, message, Modal, Typography } from "antd";
 import { User } from "iconsax-reactjs";
 import { useEffect, useRef, useState } from "react";
 
@@ -26,12 +19,18 @@ const { Paragraph } = Typography;
 
 const ToggleSupplierModal = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isGetting, setIsGetting] = useState(false);
   const { visible, onClose, onAddNew, supplier } = props;
   const [isTaking, setIsTaking] = useState<boolean>();
   const [file, setFile] = useState<any>();
+  const [formData, setFormData] = useState<FormModel>();
 
   const inpRef = useRef<any>(null);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    getFormData();
+  }, [visible]);
 
   useEffect(() => {
     if (supplier) {
@@ -72,12 +71,28 @@ const ToggleSupplierModal = (props: Props) => {
     }
   };
 
+  const getFormData = async () => {
+    setIsGetting(true);
+    const api = `/suppliers/get-form`;
+
+    try {
+      const res = await handleAPI(api);
+      res.data && setFormData(res.data);
+      console.log(res);
+    } catch (error: any) {
+      console.log(error.message);
+    } finally {
+      setIsGetting(false);
+    }
+  };
+
   const handleClose = () => {
     form.resetFields();
     onClose();
   };
   return (
     <Modal
+      loading={isGetting}
       closable={!isLoading}
       okButtonProps={{
         loading: isLoading,
@@ -116,59 +131,22 @@ const ToggleSupplierModal = (props: Props) => {
           </Button>
         </div>
       </label>
-      <Form
-        disabled={isLoading}
-        onFinish={addNewSupplier}
-        layout="horizontal"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
-        size="large"
-        form={form}
-      >
-        <Form.Item
-          name={"name"}
-          label="Tên nhà cung cấp"
-          rules={[
-            { required: true, message: "Vui lòng nhập tên nhà cung cấp" },
-          ]}
+
+      {formData && (
+        <Form
+          disabled={isLoading}
+          onFinish={addNewSupplier}
+          layout={formData.layout}
+          labelCol={{ span: formData.labelCol }}
+          wrapperCol={{ span: formData.wrapperCol }}
+          size="large"
+          form={form}
         >
-          <Input placeholder="Nhập tên nhà cung cấp" allowClear />
-        </Form.Item>
-        <Form.Item name={"product"} label="Sản phẩm">
-          <Input placeholder="Nhập sản phẩm" allowClear />
-        </Form.Item>
-        <Form.Item name={"categories"} label="Danh mục">
-          <Select options={[]} placeholder="Chọn danh mục" />
-        </Form.Item>
-        <Form.Item name={"price"} label="Giá">
-          <Input type={"number"} placeholder="Nhập giá" allowClear />
-        </Form.Item>
-        <Form.Item name={"contact"} label="SĐT">
-          <Input type={"number"} placeholder="Nhập SĐT" />
-        </Form.Item>
-        <Form.Item name={"email"} label="Email">
-          <Input type={"email"} placeholder="Nhập Email" allowClear />
-        </Form.Item>
-        <Form.Item name={"active"} label="Trạng thái">
-          <Input type={"number"} allowClear />
-        </Form.Item>
-        <Form.Item label="Trạng thái">
-          <div className="mb-2">
-            <Button
-              type={isTaking === false ? "primary" : "default"}
-              onClick={() => setIsTaking(false)}
-            >
-              Chưa thanh toán
-            </Button>
-          </div>
-          <Button
-            type={isTaking ? "primary" : "default"}
-            onClick={() => setIsTaking(true)}
-          >
-            Đã thanh toán
-          </Button>
-        </Form.Item>
-      </Form>
+          {formData.formItems.map((item) => (
+            <FormItems item={item} />
+          ))}
+        </Form>
+      )}
       <div className="d-none">
         <input
           ref={inpRef}
